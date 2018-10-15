@@ -1,53 +1,39 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import ListItem from './src/components/ListItem/ListItem';
+import PlaceList from './src/components/PlaceList/PlaceList';
+import PlaceInput from './src/components/PlaceInput/PlaceInput';
  
 export default class App extends React.Component {
-
   state = {
-    placeName:"",
-    places:[]
+    places: []
   };
 
-  placeNameChangedHandler = val => {
-    this.setState({
-      placeName: val
-    }); 
+  placeAddedHandler = placeName => {
+    this.setState(prevState => {
+      return {
+        places: prevState.places.concat(placeName)
+      };
+    });
   };
 
-  placeSubmitHandler = () => {
-      if (this.state.placeName.trim() === ""){
-        return;
-      }
-      this.setState(prevState => {
-        return {
-          places: prevState.places.concat(prevState.placeName)   
-         };
-      });
+  placeDeletedHandler = index => {
+    this.setState(prevState => {
+      return {
+        places: prevState.places.filter((place, i) => {
+          return i !== index;
+        })
+      };
+    });
   };
 
   render() {
-    const placesOutput = this.state.places.map((place,i) => (
-      <ListItem key={i} placeName={place}/>
-    ));
     return (
-      <View style={styles.container}>
-        <View style={styles.inputContainer}>
-          <TextInput 
-            placeholder = "An awesome place"
-            value={this.state.placeName} 
-            onChangeText={this.placeNameChangedHandler}
-            style={styles.placeInput}
-          />
-          
-          <Button 
-            title="Add"
-            style={styles.placeButton}
-            onPress={this.placeSubmitHandler}/>
-
-
-        </View>
-        <View style={styles.placeOutputContainer}>{placesOutput}</View>
+       <View style={styles.container}>
+        <PlaceInput onPlaceAdded={this.placeAddedHandler} />
+        <PlaceList
+          places={this.state.places}
+          onItemDeleted={this.placeDeletedHandler}
+        />
       </View>
     );
   }
@@ -60,21 +46,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start'
-  },
-  inputContainer: {
-    //flex:1,
-    width: "100%", 
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  placeInput:{
-    width: "70%"
-  },
-  placeButton : {
-    width: "30%"
-  },
-  placeOutputContainer:{
-    width: "100%",
   }
+ 
 });
